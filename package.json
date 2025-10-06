@@ -1,5 +1,5 @@
 {
-  "name": "financer",
+  "name": "teller",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
@@ -7,11 +7,11 @@
   ],
   "scripts": {
     "dev": "bun run --filter '*' dev",
-    "dev:api": "bun run --filter @financer/api dev",
-    "dev:web": "bun run --filter @financer/web dev",
-    "build:web": "bun run --filter @financer/web build",
-    "db:generate": "bun run --filter @financer/api db:generate",
-    "db:migrate": "bun run --filter @financer/api db:migrate",
+    "dev:api": "bun run --filter @teller/api dev",
+    "dev:web": "bun run --filter @teller/web dev",
+    "build:web": "bun run --filter @teller/web build",
+    "db:generate": "bun run --filter @teller/api db:generate",
+    "db:migrate": "bun run --filter @teller/api db:migrate",
     "lint": "bun run --filter '*' lint",
     "format": "bun run --filter '*' format"
   }

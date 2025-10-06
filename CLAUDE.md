@@ -4,19 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **financer** Bun workspace monorepo containing a financial tracking application with two main packages:
-- **@financer/api**: Backend API built with Elysia (Bun runtime)
-- **@financer/web**: Frontend web app built with React 19 + Vite
+This is a **teller** Bun workspace monorepo containing a financial tracking application with two main packages:
+- **@teller/api**: Backend API built with Elysia (Bun runtime)
+- **@teller/web**: Frontend web app built with React 19 + Vite
 
 Both projects use **Better Auth** for authentication and **Eden Treaty** for end-to-end type-safe API communication.
 
 ## Monorepo Structure
 
 ```
-financer/
+teller/
 ├── packages/
-│   ├── api/          # @financer/api - Backend API
-│   └── web/          # @financer/web - Frontend app
+│   ├── api/          # @teller/api - Backend API
+│   └── web/          # @teller/web - Frontend app
 ├── package.json      # Root workspace configuration
 └── CLAUDE.md         # This file
 ```
@@ -49,7 +49,7 @@ This monorepo uses **Eden Treaty** for end-to-end type safety between API and fr
 
 **How it works**:
 1. API exports its Elysia app type: `export type App = typeof app`
-2. Web imports the type via workspace dependency: `import type { App } from '@financer/api'`
+2. Web imports the type via workspace dependency: `import type { App } from '@teller/api'`
 3. Eden Treaty client provides fully typed API calls with autocomplete
 
 **Key Files**:
@@ -94,7 +94,7 @@ This application uses **Better Auth** for full-stack authentication:
 - Protected routes redirect to `/auth/sign-in` if no session found
 - Auth routes (`/auth/*`) redirect to `/` if already authenticated
 
-### API Architecture (@financer/api)
+### API Architecture (@teller/api)
 
 **Stack**: Bun + Elysia + Drizzle ORM + PostgreSQL + Better Auth
 
@@ -118,7 +118,7 @@ This application uses **Better Auth** for full-stack authentication:
 - `DATABASE_URL`: PostgreSQL connection string
 - `CLIENT_URL`: Frontend URL for CORS
 
-### Web Architecture (@financer/web)
+### Web Architecture (@teller/web)
 
 **Stack**: React 19 + TypeScript + Vite (rolldown) + React Router 7 + TanStack Query + Tailwind CSS 4 + Better Auth + Eden Treaty
 
@@ -192,6 +192,6 @@ This application uses **Better Auth** for full-stack authentication:
 ## Workspace Dependencies
 
 The web package imports the API as a workspace dependency:
-- `"@financer/api": "workspace:*"` in `packages/web/package.json`
+- `"@teller/api": "workspace:*"` in `packages/web/package.json`
 - Only types are imported (not runtime code)
 - Enables end-to-end type safety via Eden Treaty

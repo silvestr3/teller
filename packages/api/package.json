@@ -1,5 +1,5 @@
 {
-	"name": "@financer/api",
+	"name": "@teller/api",
 	"version": "1.0.50",
 	"main": "src/index.ts",
 	"types": "src/index.ts",
