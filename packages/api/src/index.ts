@@ -1,27 +1,12 @@
 import { Elysia } from "elysia";
 import { env } from "./env";
-import { betterAuthPlugin, OpenAPI } from "./http/plugins/better-auth";
-import openapi from "@elysiajs/openapi";
-import cors from "@elysiajs/cors";
+import { betterAuthPlugin } from "./http/plugins/better-auth";
+import { corsPlugin } from "./http/plugins/cors";
+import { openapiPlugin } from "./http/plugins/open-api";
 
 export const app = new Elysia()
-	.use(
-		openapi({
-			path: "/docs",
-			documentation: {
-				components: await OpenAPI.components,
-				paths: await OpenAPI.getPaths(),
-			},
-		}),
-	)
-	.use(
-		cors({
-			origin: env.CLIENT_URL,
-			methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-			credentials: true,
-			allowedHeaders: ["Content-Type", "Authorization"],
-		}),
-	)
+	.use(openapiPlugin)
+	.use(corsPlugin)
 	.use(betterAuthPlugin)
 	.listen(env.PORT);
 
