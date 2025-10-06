@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: financer-db
+    environment:
+      POSTGRES_USER: financer
+      POSTGRES_PASSWORD: financer
+      POSTGRES_DB: financer
+    ports:
+      - "5432:5432"

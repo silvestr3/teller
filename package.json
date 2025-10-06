@@ -1,0 +1,18 @@
+{
+  "name": "financer",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "dev:api": "bun run --filter @financer/api dev",
+    "dev:web": "bun run --filter @financer/web dev",
+    "build:web": "bun run --filter @financer/web build",
+    "db:generate": "bun run --filter @financer/api db:generate",
+    "db:migrate": "bun run --filter @financer/api db:migrate",
+    "lint": "bun run --filter '*' lint",
+    "format": "bun run --filter '*' format"
+  }
+}

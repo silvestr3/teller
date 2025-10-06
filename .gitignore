@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+bun.lockb
+bun.lock
+
+# Build outputs
+dist/
+build/
+.turbo/
+.rolldown-cache/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+coverage/
+
+# Misc
+*.log
+.cache/
+.temp/
+*.tsbuildinfo
