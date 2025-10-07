@@ -2,16 +2,17 @@
 	"name": "@teller/api",
 	"version": "1.0.50",
 	"main": "src/index.ts",
-	"types": "src/index.ts",
+	"types": "dist/index.d.ts",
 	"exports": {
 		".": {
-			"types": "./src/index.ts",
+			"types": "./dist/index.d.ts",
 			"default": "./src/index.ts"
 		}
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "bun run --watch src/index.ts",
+		"dev": "bun run build:types && bun run --watch src/index.ts",
+		"build:types": "tsc --build",
 		"db:generate": "bun --env-file .env --bun drizzle-kit generate",
 		"db:migrate": "bun --env-file .env --bun drizzle-kit migrate",
 		"lint": "biome lint --write",
@@ -32,6 +33,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.5",
+		"@types/bun": "^1.2.23",
 		"@types/pg": "^8.15.5",
 		"bun-types": "latest",
 		"drizzle-kit": "^0.31.5",
