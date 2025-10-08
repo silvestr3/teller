@@ -1,0 +1,1 @@
+ALTER TABLE "incomes" ADD COLUMN "is_recurring" boolean DEFAULT false NOT NULL;

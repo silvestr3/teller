@@ -22,31 +22,13 @@ import { useState } from "react";
 import { IncomeDialog } from "./components/income-dialog";
 import { useGetIncomes } from "@/api/incomes/get-incomes";
 
-const recurringIncomeList: Income[] = [
-	{
-		id: "1",
-		description: "Salário",
-		amount: 5000,
-		date: "2024-06-01",
-	},
-];
-
-const oneTimeIncomeList: Income[] = [
-	{
-		id: "2",
-		description: "Freelance Projeto X",
-		amount: 1500,
-		date: "2024-06-10",
-	},
-	{
-		id: "3",
-		description: "Venda de Produto Y",
-		amount: 300,
-		date: "2024-06-15",
-	},
-];
-
 export function IncomePage() {
+	const { data } = useGetIncomes();
+
+	const recurringIncomeList =
+		data?.filter((income) => income.isRecurring) ?? [];
+	const oneTimeIncomeList = data?.filter((income) => !income.isRecurring) ?? [];
+
 	const columns: ColumnDef<Income>[] = [
 		{
 			accessorKey: "description",

@@ -1,0 +1,1 @@
+ALTER TABLE "incomes" ALTER COLUMN "amount" SET DATA TYPE numeric;
