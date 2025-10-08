@@ -1,5 +1,7 @@
 import { apiClient } from "@/lib/api-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { QueryKeys } from "../query-keys";
+import type { Income } from "@/types/income";
 
 interface CreateIncomeInput {
 	description: string;
@@ -23,8 +25,16 @@ export const useCreateIncome = () => {
 
 	return useMutation({
 		mutationFn: createIncome,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["incomes"] });
+		onSuccess: (data) => {
+			queryClient.setQueryData(
+				[QueryKeys.GET_INCOMES],
+				(old: Array<Income>) => {
+					if (old) {
+						return [...old, data];
+					}
+					return [data];
+				},
+			);
 		},
 	});
 };

@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
+import { QueryKeys } from "../query-keys";
 
 const getIncomes = async () => {
 	const { data, error } = await apiClient.incomes.get();
@@ -13,7 +14,7 @@ const getIncomes = async () => {
 
 export const useGetIncomes = () => {
 	return useQuery({
-		queryKey: ["incomes"],
+		queryKey: [QueryKeys.GET_INCOMES],
 		queryFn: getIncomes,
 	});
 };
