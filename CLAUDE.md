@@ -111,6 +111,78 @@ This application uses **Better Auth** for full-stack authentication:
 - Snake case column naming
 - Plural table names
 - Better Auth tables: `users`, `sessions`, `accounts`, `verifications`
+- Financial amounts: Use `decimal({ precision: 10, scale: 2 })` with `.$type<number>()` for type-safe number handling
+
+**Module Structure Pattern**:
+
+Each API module follows this structure (example: incomes):
+
+```
+packages/api/src/modules/incomes/
+├── index.ts      # Elysia router with endpoints
+├── service.ts    # Business logic layer
+└── model.ts      # TypeBox schemas (optional)
+```
+
+**Example Module Implementation**:
+
+1. **Database Schema** (`packages/api/src/database/schema/incomes.ts`):
+```typescript
+export const incomes = pgTable("incomes", {
+  id: text().primaryKey().notNull().$defaultFn(() => randomUUIDv7()),
+  userId: text().notNull().references(() => users.id, { onDelete: "cascade" }),
+  description: varchar().notNull(),
+  amount: decimal({ precision: 10, scale: 2 }).notNull().$type<number>(),
+  date: date().notNull(),
+  isRecurring: boolean().notNull().default(false),
+});
+```
+
+2. **Service Layer** (`packages/api/src/modules/incomes/service.ts`):
+```typescript
+export abstract class IncomeService {
+  static async findAll({ userId }: { userId: string }) {
+    return await db.query.incomes.findMany({
+      where: eq(schema.incomes.userId, userId),
+      columns: { userId: false }, // Exclude sensitive fields
+    });
+  }
+
+  static async create(input: CreateIncomeInput) {
+    const [income] = await db.insert(schema.incomes)
+      .values(input)
+      .returning();
+    return income;
+  }
+}
+```
+
+3. **Router/Controller** (`packages/api/src/modules/incomes/index.ts`):
+```typescript
+import Elysia, { t } from "elysia";
+import { betterAuthPlugin } from "@/http/plugins/better-auth";
+
+export const incomesModule = new Elysia({ prefix: "/incomes" })
+  .use(betterAuthPlugin)
+  .get("/", async ({ user }) => {
+    return await IncomeService.findAll({ userId: user.id });
+  }, {
+    auth: true,
+    detail: { operationId: "getIncomes", tags: ["Incomes"] }
+  })
+  .post("/", async ({ user, body }) => {
+    return await IncomeService.create({ userId: user.id, ...body });
+  }, {
+    auth: true,
+    body: t.Object({
+      description: t.String({ minLength: 1 }),
+      amount: t.Number({ minimum: 0.01 }),
+      date: t.String(),
+      isRecurring: t.Optional(t.Boolean()),
+    }),
+    detail: { operationId: "createIncome", tags: ["Incomes"] }
+  });
+```
 
 **Environment Variables** (`.env` in packages/api):
 - `NODE_ENV`: development|production|test
@@ -151,8 +223,8 @@ This application uses **Better Auth** for full-stack authentication:
 - [packages/web/src/layout/](packages/web/src/layout/): Layout components (HomeLayout with sidebar, AuthLayout)
 
 **Key Patterns**:
-- **API Calls**: Eden Treaty via `api` client (see [packages/web/src/lib/api-client.ts](packages/web/src/lib/api-client.ts))
-- **Data Fetching**: React Query hooks wrapping Eden Treaty calls (see [packages/web/src/hooks/use-api.tsx](packages/web/src/hooks/use-api.tsx))
+- **API Calls**: Eden Treaty via `apiClient` (see [packages/web/src/lib/api-client.ts](packages/web/src/lib/api-client.ts))
+- **Data Fetching**: React Query hooks wrapping Eden Treaty calls in `packages/web/src/api/` directory
 - **Forms**: React Hook Form + Zod validation (see income dialog for reference)
 - **Data Tables**: TanStack Table via reusable `DataTable` component
 - **Tabs**: Reusable `CustomTabs` component for consistent interfaces
@@ -160,6 +232,88 @@ This application uses **Better Auth** for full-stack authentication:
 - **Sidebar**: shadcn/ui sidebar system with Cmd/Ctrl+B toggle
 - **React Compiler**: Enabled - avoid manual memoization unless necessary
 - **Import Alias**: `@/` maps to `src/`
+
+**API Integration Pattern**:
+
+Frontend API calls follow this structure (example: incomes):
+
+```
+packages/web/src/api/incomes/
+├── get-incomes.ts     # Query hook for fetching data
+├── create-income.ts   # Mutation hook for creating
+├── update-income.ts   # Mutation hook for updating
+└── delete-income.ts   # Mutation hook for deleting
+```
+
+**Example Hook Implementation**:
+
+1. **Query Hook** (`packages/web/src/api/incomes/get-incomes.ts`):
+```typescript
+import { apiClient } from "@/lib/api-client";
+import { useQuery } from "@tanstack/react-query";
+
+const getIncomes = async () => {
+  const { data, error } = await apiClient.incomes.get();
+  if (error) throw new Error(error.value.message);
+  return data;
+};
+
+export const useGetIncomes = () => {
+  return useQuery({
+    queryKey: ["incomes"],
+    queryFn: getIncomes,
+  });
+};
+```
+
+2. **Mutation Hook** (`packages/web/src/api/incomes/create-income.ts`):
+```typescript
+import { apiClient } from "@/lib/api-client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+interface CreateIncomeInput {
+  description: string;
+  amount: number;
+  date: string;
+  isRecurring?: boolean;
+}
+
+const createIncome = async (input: CreateIncomeInput) => {
+  const { data, error } = await apiClient.incomes.post(input);
+  if (error) throw new Error(error.value.message);
+  return data;
+};
+
+export const useCreateIncome = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createIncome,
+    onSuccess: () => {
+      // Invalidate queries to refetch data
+      queryClient.invalidateQueries({ queryKey: ["incomes"] });
+    },
+  });
+};
+```
+
+3. **Usage in Components**:
+```typescript
+// Fetching data
+const { data: incomes, isLoading } = useGetIncomes();
+
+// Creating data
+const createMutation = useCreateIncome();
+
+async function handleSubmit(formData: FormData) {
+  await createMutation.mutateAsync({
+    description: formData.description,
+    amount: formData.amount,
+    date: formData.date,
+    isRecurring: formData.isRecurring ?? false,
+  });
+}
+```
 
 **Environment Variables** (`.env` in packages/web):
 - `VITE_API_URL`: Backend API URL
@@ -176,10 +330,54 @@ This application uses **Better Auth** for full-stack authentication:
 2. Generate migration: `bun run db:generate` (from root)
 3. Apply migration: `bun run db:migrate` (from root)
 
-**Adding New API Endpoints**:
-1. Add route to API (Elysia app)
-2. Web automatically gets types via Eden Treaty - no codegen needed!
-3. Create React Query hooks in `packages/web/src/hooks/` wrapping Eden Treaty calls
+**Adding New Features (Full-Stack)**:
+
+When adding a new feature (e.g., expenses, investments), follow this workflow:
+
+1. **Database Schema** (`packages/api/src/database/schema/[feature].ts`):
+   - Define table with proper column types
+   - Use `decimal({ precision: 10, scale: 2 }).$type<number>()` for money
+   - Add foreign key to `users` table with cascade delete
+   - Export schema and add to `packages/api/src/database/schema/index.ts`
+
+2. **Generate Migration**:
+   ```bash
+   bun run db:generate  # Creates migration file
+   bun run db:migrate   # Applies migration to database
+   ```
+
+3. **API Module** (`packages/api/src/modules/[feature]/`):
+   - Create `service.ts` with business logic (static methods)
+   - Create `index.ts` with Elysia router and endpoints
+   - Use `betterAuthPlugin` and `auth: true` for protected routes
+   - Define request/response schemas with Elysia's `t` validators
+   - Mount module in main app (`packages/api/src/index.ts`)
+
+4. **Frontend API Hooks** (`packages/web/src/api/[feature]/`):
+   - Create query hooks (e.g., `get-[feature].ts`) using `useQuery`
+   - Create mutation hooks (e.g., `create-[feature].ts`) using `useMutation`
+   - Always invalidate relevant queries in `onSuccess` callbacks
+   - Types are automatically inferred from backend via Eden Treaty
+
+5. **UI Components** (`packages/web/src/pages/(app)/[feature]/`):
+   - Create page component with data fetching hooks
+   - Create dialog/form components for create/edit operations
+   - Use React Hook Form + Zod for form validation
+   - Use `DataTable` component for displaying lists
+
+**Example: Adding a New Module**:
+```bash
+# Backend
+packages/api/src/database/schema/expenses.ts
+packages/api/src/modules/expenses/service.ts
+packages/api/src/modules/expenses/index.ts
+
+# Frontend
+packages/web/src/api/expenses/get-expenses.ts
+packages/web/src/api/expenses/create-expense.ts
+packages/web/src/pages/(app)/expenses/index.tsx
+packages/web/src/pages/(app)/expenses/components/expense-dialog.tsx
+```
 
 ## Code Style
 
