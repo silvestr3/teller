@@ -19,6 +19,6 @@ export const incomes = pgTable("incomes", {
 		.references(() => users.id, { onDelete: "cascade" }),
 	isRecurring: boolean().notNull().default(false),
 	description: varchar().notNull(),
-	amount: decimal().notNull(),
+	amount: decimal({ precision: 10, scale: 2 }).notNull().$type<number>(),
 	date: date().notNull(),
 });
