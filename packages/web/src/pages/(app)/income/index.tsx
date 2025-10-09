@@ -21,9 +21,14 @@ import {
 import { useState } from "react";
 import { IncomeDialog } from "./components/income-dialog";
 import { useGetIncomes } from "@/api/incomes/get-incomes";
+import { useDeleteIncome } from "@/api/incomes/delete-income";
+import { toast } from "sonner";
+import { DeleteDialog } from "./components/delete-dialog";
 
 export function IncomePage() {
 	const { data } = useGetIncomes();
+	const { mutate: deleteIncome } = useDeleteIncome();
+	const [openDeleteDialog, setOpenDeleteDialog] = useState<string | null>(null);
 
 	const recurringIncomeList =
 		data?.filter((income) => income.isRecurring) ?? [];
@@ -52,7 +57,7 @@ export function IncomePage() {
 		},
 		{
 			id: "actions",
-			cell: () => {
+			cell: ({ row }) => {
 				const [isOpen, setIsOpen] = useState(false);
 
 				return (
@@ -75,6 +80,9 @@ export function IncomePage() {
 								<DropdownMenuItem
 									variant="destructive"
 									className="cursor-pointer"
+									onClick={() => {
+										setOpenDeleteDialog(row.original.id);
+									}}
 								>
 									<Trash size={8} />
 									Deletar
@@ -86,6 +94,20 @@ export function IncomePage() {
 			},
 		},
 	];
+
+	function handleDeleteIncome() {
+		if (!openDeleteDialog) return;
+
+		deleteIncome(openDeleteDialog, {
+			onSuccess: () => {
+				toast.success("Receita deletada com sucesso");
+				setOpenDeleteDialog(null);
+			},
+			onError: (error) => {
+				toast.error(error.message);
+			},
+		});
+	}
 
 	const tabs = [
 		{
@@ -127,6 +149,11 @@ export function IncomePage() {
 			</div>
 
 			<CustomTabs tabs={tabs} />
+			<DeleteDialog
+				isOpen={openDeleteDialog !== null}
+				onClose={() => setOpenDeleteDialog(null)}
+				onConfirm={handleDeleteIncome}
+			/>
 		</div>
 	);
 }
