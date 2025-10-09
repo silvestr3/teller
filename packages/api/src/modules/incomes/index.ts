@@ -1,15 +1,17 @@
 import Elysia, { t } from "elysia";
 import { betterAuthPlugin } from "@/http/plugins/better-auth";
 import { IncomeService } from "./service";
+import { IncomeModel } from "./model";
 
 export const incomesModule = new Elysia({
 	prefix: "/incomes",
 })
 	.use(betterAuthPlugin)
+	.decorate("service", new IncomeService())
 	.get(
 		"/",
-		async ({ user }) => {
-			return await IncomeService.findAll({ userId: user.id });
+		async ({ user, service }) => {
+			return await service.findAll({ userId: user.id });
 		},
 		{
 			auth: true,
@@ -22,8 +24,8 @@ export const incomesModule = new Elysia({
 	)
 	.post(
 		"/",
-		async ({ user, body }) => {
-			return await IncomeService.create({
+		async ({ user, body, service }) => {
+			return await service.create({
 				userId: user.id,
 				description: body.description,
 				amount: body.amount,
@@ -33,15 +35,30 @@ export const incomesModule = new Elysia({
 		},
 		{
 			auth: true,
-			body: t.Object({
-				description: t.String({ minLength: 1 }),
-				amount: t.Number({ minimum: 0.01 }),
-				date: t.String(),
-				isRecurring: t.Optional(t.Boolean()),
-			}),
+			body: t.Omit(IncomeModel.createIncomeSchema, ["userId"]),
 			detail: {
 				operationId: "createIncome",
 				summary: "Create a new income",
+				tags: ["Incomes"],
+			},
+		},
+	)
+	.delete(
+		"/:id",
+		async ({ user, params, service }) => {
+			return await service.delete({
+				id: params.id,
+				userId: user.id,
+			});
+		},
+		{
+			auth: true,
+			params: t.Object({
+				id: t.String({ minLength: 1 }),
+			}),
+			detail: {
+				operationId: "deleteIncome",
+				summary: "Delete an income",
 				tags: ["Incomes"],
 			},
 		},
