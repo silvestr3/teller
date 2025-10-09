@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 export interface CreateIncomeInput {
 	userId: string;
 	description: string;
-	amount: number;
+	amountCents: number;
 	date: string;
 	isRecurring: boolean;
 }
@@ -50,14 +50,14 @@ export abstract class IncomeRepository {
 			.values({
 				userId: data.userId,
 				description: data.description,
-				amount: data.amount,
+				amountCents: data.amountCents,
 				date: data.date,
 				isRecurring: data.isRecurring,
 			})
 			.returning({
 				id: schema.incomes.id,
 				description: schema.incomes.description,
-				amount: schema.incomes.amount,
+				amountCents: schema.incomes.amountCents,
 				date: schema.incomes.date,
 				isRecurring: schema.incomes.isRecurring,
 			});

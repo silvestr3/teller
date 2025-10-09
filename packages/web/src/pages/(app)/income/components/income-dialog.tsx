@@ -52,7 +52,7 @@ export function IncomeDialog({ children, mode }: IncomeDialogProps) {
 		mutate(
 			{
 				description: data.description,
-				amount: data.amount.toString(),
+				amount: data.amount,
 				date: data.date,
 				isRecurring: data.recurring ?? false,
 			},

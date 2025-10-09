@@ -3,7 +3,7 @@ import {
 	date,
 	pgTable,
 	varchar,
-	decimal,
+	integer,
 	text,
 	boolean,
 } from "drizzle-orm/pg-core";
@@ -19,6 +19,6 @@ export const incomes = pgTable("incomes", {
 		.references(() => users.id, { onDelete: "cascade" }),
 	isRecurring: boolean().notNull().default(false),
 	description: varchar().notNull(),
-	amount: decimal({ precision: 10, scale: 2 }).notNull().$type<number>(),
+	amountCents: integer().notNull(),
 	date: date().notNull(),
 });

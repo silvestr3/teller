@@ -1,9 +1,10 @@
 CREATE TABLE "incomes" (
 	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"is_recurring" boolean DEFAULT false NOT NULL,
 	"description" varchar NOT NULL,
-	"amount" integer NOT NULL,
-	"date" date NOT NULL,
-	"user_id" text NOT NULL
+	"amount_cents" integer NOT NULL,
+	"date" date NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "verifications" (
