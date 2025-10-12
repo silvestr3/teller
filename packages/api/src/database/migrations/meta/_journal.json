@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1759970800946,
-      "tag": "0000_ambitious_zarek",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1760294336194,
-      "tag": "0001_chemical_mandarin",
+      "when": 1760296038077,
+      "tag": "0000_curved_sebastian_shaw",
       "breakpoints": true
     }
   ]

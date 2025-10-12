@@ -5,6 +5,7 @@ import { verifications } from "./verifications";
 import { categories } from "./categories";
 import { recurringTemplates } from "./recurring-templates";
 import { transactions } from "./transactions";
+import { incomes } from "./incomes";
 
 export const schema = {
 	// auth
@@ -12,6 +13,9 @@ export const schema = {
 	accounts,
 	sessions,
 	verifications,
+
+	// deprecated - to be removed
+	incomes,
 
 	// finance management
 	categories,
