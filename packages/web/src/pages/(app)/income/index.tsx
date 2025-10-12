@@ -120,7 +120,20 @@ export function IncomePage() {
 					aria-hidden="true"
 				/>
 			),
-			content: <DataTable columns={columns} data={recurringIncomeList} />,
+			content: (
+				<DataTable
+					columns={columns}
+					data={recurringIncomeList}
+					emptyState={
+						<div className="flex justify-center gap-1 items-center text-muted-foreground">
+							Nenhuma receita recorrente encontrada -
+							<Button variant="link" className="p-0 w-fit">
+								Cadastrar
+							</Button>
+						</div>
+					}
+				/>
+			),
 		},
 		{
 			value: "one-time",
@@ -132,7 +145,20 @@ export function IncomePage() {
 					aria-hidden="true"
 				/>
 			),
-			content: <DataTable columns={columns} data={oneTimeIncomeList} />,
+			content: (
+				<DataTable
+					columns={columns}
+					data={oneTimeIncomeList}
+					emptyState={
+						<div className="flex justify-center gap-1 items-center text-muted-foreground">
+							Nenhuma receita pontual encontrada -
+							<Button variant="link" className="p-0 w-fit">
+								Cadastrar
+							</Button>
+						</div>
+					}
+				/>
+			),
 		},
 	];
 
