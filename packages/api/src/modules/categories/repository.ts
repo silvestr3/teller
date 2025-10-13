@@ -19,7 +19,10 @@ export interface UpdateCategoryInput {
 export abstract class CategoryRepository {
 	static async findOne(userId: string, id: string) {
 		const category = await db.query.categories.findFirst({
-			where: and(eq(schema.categories.userId, userId), eq(schema.categories.id, id)),
+			where: and(
+				eq(schema.categories.userId, userId),
+				eq(schema.categories.id, id),
+			),
 			columns: {
 				userId: false,
 			},
@@ -30,7 +33,7 @@ export abstract class CategoryRepository {
 
 	static async findAllByUserId(userId: string, type?: "income" | "expense") {
 		const whereConditions = [eq(schema.categories.userId, userId)];
-		
+
 		if (type) {
 			whereConditions.push(eq(schema.categories.type, type));
 		}
@@ -68,11 +71,17 @@ export abstract class CategoryRepository {
 		return category;
 	}
 
-	static async updateOne(id: string, userId: string, data: UpdateCategoryInput) {
+	static async updateOne(
+		id: string,
+		userId: string,
+		data: UpdateCategoryInput,
+	) {
 		const [category] = await db
 			.update(schema.categories)
 			.set(data)
-			.where(and(eq(schema.categories.id, id), eq(schema.categories.userId, userId)))
+			.where(
+				and(eq(schema.categories.id, id), eq(schema.categories.userId, userId)),
+			)
 			.returning({
 				id: schema.categories.id,
 				name: schema.categories.name,
@@ -88,7 +97,9 @@ export abstract class CategoryRepository {
 	static async deleteOne(id: string, userId: string) {
 		const [deletedCategory] = await db
 			.delete(schema.categories)
-			.where(and(eq(schema.categories.id, id), eq(schema.categories.userId, userId)))
+			.where(
+				and(eq(schema.categories.id, id), eq(schema.categories.userId, userId)),
+			)
 			.returning({
 				id: schema.categories.id,
 			});
@@ -96,7 +107,10 @@ export abstract class CategoryRepository {
 		return deletedCategory;
 	}
 
-	static async checkCategoryInUse(categoryId: string, userId: string): Promise<boolean> {
+	static async checkCategoryInUse(
+		categoryId: string,
+		userId: string,
+	): Promise<boolean> {
 		// Check if category is used in transactions
 		const transactionCount = await db
 			.select({ count: schema.transactions.id })
@@ -104,8 +118,8 @@ export abstract class CategoryRepository {
 			.where(
 				and(
 					eq(schema.transactions.categoryId, categoryId),
-					eq(schema.transactions.userId, userId)
-				)
+					eq(schema.transactions.userId, userId),
+				),
 			);
 
 		// Check if category is used in recurring templates
@@ -115,8 +129,8 @@ export abstract class CategoryRepository {
 			.where(
 				and(
 					eq(schema.recurringTemplates.categoryId, categoryId),
-					eq(schema.recurringTemplates.userId, userId)
-				)
+					eq(schema.recurringTemplates.userId, userId),
+				),
 			);
 
 		return transactionCount.length > 0 || templateCount.length > 0;

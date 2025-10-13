@@ -7,7 +7,7 @@ interface CreateIncomeInput {
 	description: string;
 	amount: number;
 	date: string;
-	isRecurring?: boolean;
+	isRecurring: boolean;
 }
 
 const createIncome = async (input: CreateIncomeInput) => {

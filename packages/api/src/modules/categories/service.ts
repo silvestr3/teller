@@ -16,7 +16,13 @@ interface UpdateCategoryServiceInput {
 }
 
 export class CategoryService {
-	async findAll({ userId, type }: { userId: string; type?: "income" | "expense" }) {
+	async findAll({
+		userId,
+		type,
+	}: {
+		userId: string;
+		type?: "income" | "expense";
+	}) {
 		return await CategoryRepository.findAllByUserId(userId, type);
 	}
 
@@ -34,7 +40,15 @@ export class CategoryService {
 		return await CategoryRepository.createOne(input);
 	}
 
-	async update({ id, userId, data }: { id: string; userId: string; data: UpdateCategoryServiceInput }) {
+	async update({
+		id,
+		userId,
+		data,
+	}: {
+		id: string;
+		userId: string;
+		data: UpdateCategoryServiceInput;
+	}) {
 		// First check if category exists and belongs to user
 		const existingCategory = await CategoryRepository.findOne(userId, id);
 
@@ -42,7 +56,11 @@ export class CategoryService {
 			throw status(404, { message: "Category not found" });
 		}
 
-		const updatedCategory = await CategoryRepository.updateOne(id, userId, data);
+		const updatedCategory = await CategoryRepository.updateOne(
+			id,
+			userId,
+			data,
+		);
 
 		if (!updatedCategory) {
 			throw status(404, { message: "Category not found" });
@@ -63,8 +81,9 @@ export class CategoryService {
 		const isInUse = await CategoryRepository.checkCategoryInUse(id, userId);
 
 		if (isInUse) {
-			throw status(409, { 
-				message: "Cannot delete category that is used in transactions or recurring templates" 
+			throw status(409, {
+				message:
+					"Cannot delete category that is used in transactions or recurring templates",
 			});
 		}
 
