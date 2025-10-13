@@ -6,7 +6,7 @@ import { openapiPlugin } from "@/http/plugins/open-api";
 import { incomesModule } from "@/modules/incomes";
 import { categoriesModule } from "@/modules/categories";
 
-const app = new Elysia()
+export const app = new Elysia()
 	.use(openapiPlugin)
 	.use(corsPlugin)
 	.use(betterAuthPlugin)

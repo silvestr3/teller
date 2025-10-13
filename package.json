@@ -13,6 +13,7 @@
 		"db:generate": "bun run --filter @teller/api db:generate",
 		"db:migrate": "bun run --filter @teller/api db:migrate",
 		"lint": "bun run --filter '*' lint",
-		"format": "bun run --filter '*' format"
+		"format": "bun run --filter '*' format",
+		"test": "bun run --filter @teller/api test"
 	}
 }
